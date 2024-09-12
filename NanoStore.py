@@ -1,5 +1,4 @@
-#NanoStartStore
-#pip install colorama
+#Nano   Store
 
 import time
 import random
@@ -60,11 +59,13 @@ class Games:
             if terug == "":
                 NanoStart()
     def Galgje():
+        # Woordenlijsten
         WoordenlijstDieren = ["Kat", "Hond", "Vis", "Rat", "Bij", "Uil", "Kip", "Mug", "Eek", "Vos"]
         WoordenlijstKleuren = ["Rood", "Blauw", "Geel", "Groen", "Roze", "Paars", "Grijs", "Zwart", "Wit", "Cyaan"]
         WoordenlijstVoedsel = ["Appel", "Peer", "Brood", "Ei", "Melk", "Kaas", "Soep", "Rijst", "Vis", "Kip"]
        
-        Woordkeuze = input("Welke categorie wil je kiezen?\n1. Dieren\n2. Kleuren\n3. Voedsel\n")
+        # Keuze van de woordenlijst
+        Woordkeuze = input("\nWelke categorie wil je kiezen?\n1. Dieren\n2. Kleuren\n3. Voedsel\n")
         if Woordkeuze == "Dieren" or Woordkeuze == "dieren" or Woordkeuze == "1":
             Woordenlijst = WoordenlijstDieren
         elif Woordkeuze == "Kleuren" or Woordkeuze == "kleuren" or Woordkeuze == "2":
@@ -76,16 +77,14 @@ class Games:
             Games.Galgje()                       
         
         
-        
-        Geraden = 0
-        Woord = Woordenlijst[random.randrange(0, len(Woordenlijst))]
-        Letters = list(str.lower(Woord))
-        GeradenLetters = ["_" for _ in Letters]
-        Fouten = 0
+        Geraden = 0 #Boolean om te kijken of het woord is geraden
+        Woord = Woordenlijst[random.randrange(0, len(Woordenlijst))] # Kiest een random woord uit de lijst
+        Letters = list(str.lower(Woord)) # Maakt een lijst van de letters van het woord
+        GeradenLetters = ['_' for _ in Letters] # Maakt een lijst van de letters van het woord, maar dan met underscores
+        Fouten = 0 # Aantal fouten die je hebt gemaakt
 
-
+        # Print de galg
         print(LineBreak)
-
         print(" =====")
         print(" |   ||")
         print("     ||")
@@ -94,17 +93,19 @@ class Games:
         print("     ||")
         print("     ||")
         print(" ========")
+        
+        # Loop voor het spel
         while Geraden == 0:
             
 
             LetterGuess = input("geef een letter: \n").lower()
             if LetterGuess in Letters:
                 print("\ngoed\n")
-                for i, letter in enumerate(Letters):
+                for i, letter in enumerate(Letters): # Enumerate zorgt er voor dat je de index en de waarde van de letter krijgt
                     if letter == LetterGuess:
-                        GeradenLetters[i] = LetterGuess
+                        GeradenLetters[i] = LetterGuess # Als de letter goed is, dan wordt de underscore vervangen door de letter
                 print(GeradenLetters)
-                if "_" not in GeradenLetters:
+                if "_" not in GeradenLetters: # Als er geen underscores meer in de lijst zitten, dan is het woord geraden
                     Geraden = 1
                     print("Je hebt het woord geraden!")
                     terug = (input("Druk op enter om verder te gaan\n"))
@@ -112,12 +113,12 @@ class Games:
                         NanoStart()
 
             else:
-                print("\nfout\n")
+                print("\nfout\n") # Als de letter fout is, dan wordt er een fout bij opgeteld
                 Fouten += 1
                 print("Aantal fouten:", Fouten)
                 print(GeradenLetters, "\n")
 
-            if Fouten == 0:
+            if Fouten == 0: # Dit zorgt er voor dat de galgen wordt geprint\/\/\/\/
                 print(" =====")
                 print(" |   ||")
                 print("     ||")
@@ -126,7 +127,7 @@ class Games:
                 print("     ||")
                 print("     ||")
                 print(" ========")
-            if Fouten == 1:
+            if Fouten == 1: 
                 print(" =====")
                 print(" |   ||")
                 print(" O   ||")
@@ -180,10 +181,9 @@ class Games:
                 print("     ||")
                 print("     ||")
                 print(" ========")
-                print(" ")
-                print("Game Over")
+                print("\nGame Over\n")
                 print("Het woord was: ", Woord)
-                terug = (input("Druk op enter om verder te gaan\n"))
+                terug = (input("\nDruk op enter om verder te gaan\n")) # Dit zorgt er voor dat je op enter moet drukken om verder te gaan naar het menu
                 if terug == "":
                     NanoStart()
             if Fouten > 6:
