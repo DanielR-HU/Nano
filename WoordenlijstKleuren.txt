@@ -1,0 +1,1 @@
+Rood,Blauw,Geel,Groen,Roze,Paars,Grijs,Zwart,Wit,Cyaan
