@@ -1,0 +1,10 @@
+hond
+kat
+boom
+bal
+auto
+huis
+muis
+stoel
+boek
+fiets
