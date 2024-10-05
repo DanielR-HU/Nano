@@ -1,4 +1,4 @@
-#nano 2.0
+#NanoXL!
 
 import time
 import random
@@ -6,9 +6,32 @@ import os
 import datetime
 import requests
 import tkinter as tk
-
+import json
 
 #main functies
+def Files():
+    if not os.path.exists("users.json"):
+        with open("users.json", "w") as file:
+            json.dump({}, file)
+    if not os.path.exists("HighscoresNummer.json"):
+        with open("HighscoresNummer.json", "w") as file:
+            json.dump({}, file)
+
+    if not os.path.exists("LogGalgje.txt"):
+        with open("LogGalgje.txt", "w") as file:
+            file.write("")
+    
+    if not os.path.exists("WoordenlijstMakkelijk.txt"):
+        with open("WoordenlijstMakkelijk.txt", "w") as file:
+            file.write("hond\nkat\nboom\nbal\nauto\nhuis\nmuis\nstoel\nboek\nfiets\n")
+    
+    if not os.path.exists("WoordenlijstNormaal.txt"):
+        with open("WoordenlijstNormaal.txt", "w") as file:
+            file.write("tafel\nappel\nschool\nwater\nkasteel\nvriend\ntrolley\nlaptop\nleraar\nmuziek\n")
+    
+    if not os.path.exists("WoordenlijstMoeilijk.txt"):
+        with open("WoordenlijstMoeilijk.txt", "w") as file:
+            file.write("paradox\nsubstantieel\nonverzettelijk\nepistemologie\nambivalentie\nstereotypisch\nnostalgisch\ntranscendent\nhypothese\nijdelheid\n")
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -21,20 +44,22 @@ def inloggen():
     username = input("> ")
     print("\nWachtwoord:")
     password = input("> ")
-    with open("users.txt", "r") as file:
-        for line in file:
-            user, pw = line.strip().split(",")
-            if user == username and pw == password:
-                clear()
-                print(f"Welkom {username}")
-                time.sleep(1)
-                return username
-            else:
-                print("Gebruikersnaam of wachtwoord is fout")
-                time.sleep(1)
-                return AccountPagina()
-        print("Gebruikersnaam of wachtwoord is fout")
 
+    data = json.load(open("users.json"))
+    if username in data:
+        if data[username] == password:
+            clear()
+            print(f"Welkom {username}")
+            time.sleep(1)
+            return username
+        else:
+            print("Wachtwoord is fout")
+            time.sleep(1)
+            return AccountPagina()
+    else:
+        print("Gebruikersnaam is fout of bestaat niet")
+        time.sleep(1)
+        return AccountPagina()
 def registreren():
     clear()
     print("Welkom bij Nano\n")
@@ -43,10 +68,20 @@ def registreren():
     username = input(">")
     print("\nWachtwoord:")
     password = input(">")
-    with open("users.txt", "a") as file:
-        file.write(username + "," + password + "\n")
-    clear()
-    print("Account gemaakt")
+
+    with open("users.json", "r") as file:
+        data = json.load(file)
+
+    if username in data:
+        print("Gebruikersnaam bestaat al")
+        time.sleep(1)
+        AccountPagina()
+    else:
+        data[username] = password
+        with open("users.json", "w") as file:
+            json.dump(data, file, indent=4) # Dit zorgt er voor dat de data in de json file wordt gezet en indent=4 zorgt er voor dat het netjes wordt opgeslagen
+        print("Registratie succesvol")
+
     time.sleep(1)
     return AccountPagina()
 
@@ -93,28 +128,17 @@ def AppPagina(username):
 
 def CijferGuess(username):
     highscore = 0
-    highscore = int(highscore) 
-    userInlijst = False
+    with open("HighscoresNummer.json", "r") as file:
+        data = json.load(file)
 
-    with open("HighscoreCijfer.txt", "r") as file:
-        lines = file.readlines()
+    if username in data:
+        highscore = data[username]
 
-    for line in lines:
+    else:
+        data[username] = highscore
+        with open("HighscoresNummer.json", "w") as file:
+            json.dump(data, file, indent=4)
         
-        user, highscoreL = line.strip().split(",")
-        if user == username:
-            highscore = highscoreL
-            userInlijst = True
-            break
-    if userInlijst == False:
-        with open("HighscoreCijfer.txt", "r") as file:
-            lines = file.readlines()
-        with open("HighscoreCijfer.txt", "w") as file:
-            lines.append(f"{username},0\n")
-            file.writelines(lines)
-
-
-
     clear()
     Cijfer_Graad = input(f"\t\t\tWelkom bij het cijfer guess spel {username}!\n\t\t\t   --------Je highscore is {highscore}--------\n\n\t\tVul het cijfer in van de moeilijkeids graad die je wilt. \n\n\nWil je het makkelijk, normaal of moeilijk maken?\n 8 = makkelijk\n 4 = normaal\n 3 = moeilijk\n 1 = onmogelijk\n\n> ")
     if Cijfer_Graad.isdigit():
@@ -149,12 +173,9 @@ def CijferGuess(username):
                     if int(aantal_guesses) < int(highscore) or int(highscore) == 0:
                         print("Je hebt een nieuwe highscore!")
                         highscore = aantal_guesses
-                        with open("HighscoreCijfer.txt", "r") as file:
-                            lines = file.readlines()
-                            lines.remove(f"{username},{highscoreL}\n")
-                        with open("HighscoreCijfer.txt", "w") as file:
-                            lines.append(f"{username},{aantal_guesses}\n")
-                            file.writelines(lines)
+                        data[username] = highscore
+                        with open("HighscoresNummer.json", "w") as file:
+                            json.dump(data, file, indent=4)
                     terug = (input("Druk op enter om verder te gaan\n"))
                     if terug == "":
                         AppPagina(username)
@@ -467,8 +488,8 @@ def EONET(username):
         if terug == "":
             EONET(username)
 
-
 def main():
+    Files()
     username = AccountPagina()
     AppPagina(username)
     
