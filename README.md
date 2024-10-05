@@ -1,3 +1,15 @@
-Hallo
+Dit is de Nano store van Daniel.
+Dit is een schoolproject voor mijn opleiding.
 
-Dit is mijn Nano project
+In dit programma:
+- Inlog/Registratie
+- Cijfer raad spel
+- Galgje
+- Boter Kaas en Eieren met een gui
+- Weer app
+- NASA EONET programma
+
+  Download de zip die bij releases staat en run de bat file.
+  Alternatief kan je ook in de cmd python Nano.py runnen.
+
+  Bedankt voor het bekijken.
