@@ -1,4 +1,0 @@
-Jantje,5
-Pieter,3
-DanielR,3
-admin,3
