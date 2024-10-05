@@ -1,3 +1,4 @@
-Jantje,451235
-Pieter,5
-DanielR,2
+Jantje,5
+Pieter,3
+DanielR,3
+admin,3

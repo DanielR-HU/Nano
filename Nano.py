@@ -7,6 +7,7 @@ import datetime
 import requests
 import tkinter as tk
 
+
 #main functies
 
 def clear():
@@ -58,6 +59,8 @@ def AccountPagina():
         return username
     elif keuze == "2":
         registreren()
+    elif keuze == "admin":
+        return "admin"
     else:
         print("Foute invoer")
         time.sleep(1)
@@ -67,7 +70,7 @@ def AppPagina(username):
     clear()
     print("Welkom bij Nano\n")
     print("Kies een app:")
-    print("1. CijferGuess\n2. Galgje\n3. Galgje log\n4. Boter kaas en eieren (GUI)\n5. Het weer\n6. Exit\n")
+    print("1. CijferGuess\n2. Galgje\n3. Galgje log\n4. Boter kaas en eieren (GUI)\n5. Het weer\n6. EONET (NASA)\n7. Exit\n")
     keuze = input("> ")
     if keuze == "1":
         CijferGuess(username)
@@ -80,6 +83,8 @@ def AppPagina(username):
     elif keuze == "5":
         HetWeer(username)
     elif keuze == "6":
+        EONET(username)
+    elif keuze == "7":
         exit()
     else:
         print("Foute invoer")
@@ -88,12 +93,28 @@ def AppPagina(username):
 
 def CijferGuess(username):
     highscore = 0
+    highscore = int(highscore) 
+    userInlijst = False
+
     with open("HighscoreCijfer.txt", "r") as file:
-        for line in file:
-            user, highscoreL = line.strip().split(",")
-            if user == username:
-                highscore = highscoreL
-                break
+        lines = file.readlines()
+
+    for line in lines:
+        
+        user, highscoreL = line.strip().split(",")
+        if user == username:
+            highscore = highscoreL
+            userInlijst = True
+            break
+    if userInlijst == False:
+        with open("HighscoreCijfer.txt", "r") as file:
+            lines = file.readlines()
+        with open("HighscoreCijfer.txt", "w") as file:
+            lines.append(f"{username},0\n")
+            file.writelines(lines)
+
+
+
     clear()
     Cijfer_Graad = input(f"\t\t\tWelkom bij het cijfer guess spel {username}!\n\t\t\t   --------Je highscore is {highscore}--------\n\n\t\tVul het cijfer in van de moeilijkeids graad die je wilt. \n\n\nWil je het makkelijk, normaal of moeilijk maken?\n 8 = makkelijk\n 4 = normaal\n 3 = moeilijk\n 1 = onmogelijk\n\n> ")
     if Cijfer_Graad.isdigit():
@@ -103,11 +124,11 @@ def CijferGuess(username):
         else:
             print("Dit is geen geldige keuze")
             time.sleep(1)
-            CijferGuess()
+            CijferGuess(username)
     else:
         print("\nDit is geen nummer")
         time.sleep(1)
-        CijferGuess()
+        CijferGuess(username)
 
     aantal_guesses = 0
     aantal_guesses = int(aantal_guesses)
@@ -125,12 +146,15 @@ def CijferGuess(username):
                     clear()
                     print("\nGoed geraden!")
                     print(f"Je hebt het in {aantal_guesses} keer geraden\n")
-                    with open("HighscoreCijfer.txt", "r") as file:
-                        lines = file.readlines()
-                        lines.remove(f"{username},{highscore}\n")
-                    with open("HighscoreCijfer.txt", "w") as file:
-                        lines.append(f"{username},{aantal_guesses}\n")
-                        file.writelines(lines)
+                    if int(aantal_guesses) < int(highscore) or int(highscore) == 0:
+                        print("Je hebt een nieuwe highscore!")
+                        highscore = aantal_guesses
+                        with open("HighscoreCijfer.txt", "r") as file:
+                            lines = file.readlines()
+                            lines.remove(f"{username},{highscoreL}\n")
+                        with open("HighscoreCijfer.txt", "w") as file:
+                            lines.append(f"{username},{aantal_guesses}\n")
+                            file.writelines(lines)
                     terug = (input("Druk op enter om verder te gaan\n"))
                     if terug == "":
                         AppPagina(username)
@@ -337,17 +361,19 @@ def BoterKaasEieren(username):
 
 def HetWeer(username):
     clear()
-
-    countryCode = "NL" # Er is een country code nodig dus NL
-    city = input("Voer stad in: ")
-
-    locationKey = requests.get(f"http://dataservice.accuweather.com/locations/v1/cities/{countryCode}/search?apikey=NCkXL1pFDKcj3MAl2wpiif2jcI6yowRH&q={city}") #Dit haalt de locatie key op van de gegeven stad met de api.
-    try: #Dit moet omdat als je bijvoorbeeld een land geeft of iets doms dan geeft ie een error
-        locationKey = locationKey.json()[0]["Key"] # Het geeft een hele mik van info over de stad maar we hebben alleen de key nodig
-    except:
-        print("Stad niet gevonden of ongeldige invoer")
-        time.sleep(1)
-        HetWeer(username)
+    
+    while True:
+        city = input("Voer plaats in:\n> ")
+        locationKey = requests.get(f"http://dataservice.accuweather.com/locations/v1/cities/search?apikey=NCkXL1pFDKcj3MAl2wpiif2jcI6yowRH&q={city}") #Dit haalt de locatie key op van de gegeven stad met de api.
+        try: #Dit moet omdat als je bijvoorbeeld een land geeft of iets doms dan geeft ie een error
+            locationKey = locationKey.json()[0]["Key"] # Het geeft een hele mik van info over de stad maar we hebben alleen de key nodig
+            break
+        except:
+            print("Stad niet gevonden of ongeldige invoer")
+            time.sleep(1)
+            clear()
+            
+        
     response = requests.get(f'http://dataservice.accuweather.com/forecasts/v1/daily/1day/{locationKey}?apikey=NCkXL1pFDKcj3MAl2wpiif2jcI6yowRH&language=nl-nl&details=true&metric=true') #Dit haalt alle weersdata van de stad op van deze dag met de locatie key
     
     data = response.json() #Je krijgt een moker grote json structuur met alle data van het weer vandaag en met de onderstaande code halen we de data eruit die we willen hebben.
@@ -366,11 +392,12 @@ def HetWeer(username):
     wind = voorspelling["Day"]["Wind"]["Speed"]["Value"]
     windRichting = voorspelling["Day"]["Wind"]["Direction"]["Localized"]
     wolkenCover = voorspelling["Day"]["CloudCover"]
-    wolkSoort = voorspelling["Day"]["LongPhrase"]
+    HetWeer = voorspelling["Day"]["LongPhrase"]
     source = voorspelling["Sources"]
     
     # En voorzelfsprekend printen we de data
     clear()
+    print(f"Vandaag in {city}:\n")
     print("Temperatuur:")
     print(f"De minimale temperatuur is vandaag {minTemp} graden")
     print(f"De maximale temperatuur is vandaag {maxTemp} graden")
@@ -385,15 +412,65 @@ def HetWeer(username):
     print(f"De windsnelheid is vandaag {wind} km/h")
     print(f"De windrichting is vandaag {windRichting}")
     print(f"De bewolking is vandaag {wolkenCover}%")
-    print(f"De soort bewolking is vandaag: {wolkSoort}")
+    print(f"Het weer is vandaag {HetWeer}")
     print(f"\nBron: {source}")
 
     terug = (input("Druk op enter om verder te gaan\n"))
     if terug == "":
         AppPagina(username)
 
+def EONET(username):
+    clear()
+    skip = False
+    if skip == False:
+        print("Welkom bij EONET!\nDit is een programma dat de data van NASA haalt over natuurrampen\nZometeen moet je een categorie kiezen en dan krijg je alle events van die categorie van de afgelopen 31 dagen.\nHet kan zijn dat er niks is.\n")
+        input("Druk op enter om verder te gaan\n")
+        clear()
+    try:
+        response = requests.get("https://eonet.gsfc.nasa.gov/api/v2.1/categories?days=31")
+        response.raise_for_status()  # Raise an HTTPError for bad responses
+        categories = response.json()["categories"]
+        
+        # Dit maakt een dictionary van de categorieën, waarbij de titel de key is en de hele categorie de value
+        category_map = {category["title"]: category for category in categories}
+        
+        # Dit print alle categorieën
+        for title, category in category_map.items():
+            print(f"{title}:\n   {category['description']}")
+
+        keuze = input("\nSchrijf de categorie precies over a.u.b.\nKies een categorie:\n> ")
+        if keuze in category_map:
+            categorieID = category_map[keuze]['id'] # Dit haalt de categorieID op van de gekozen categorie
+            responseCat = requests.get(f"https://eonet.gsfc.nasa.gov/api/v2.1/categories/{categorieID}?days=31") # Dit haalt de data op van de gekozen categorie
+            #print(responseCat.json())
+            event_map = {event["title"]: event for event in responseCat.json()["events"]} # Dit maakt een dictionary van de events, waarbij de titel de key is en de hele event de value
+            if not event_map:
+                clear()
+                print("Er zijn geen events in deze categorie")
+            else:
+                clear()
+                for title, event in event_map.items():
+                    print(f"{title}:\n   {event['geometries'][0]['date']}")
+                terug = (input("Druk op enter om terug te gaan\n"))
+                if terug == "":
+                    AppPagina(username)
+        else:
+            clear()
+            print("Ongeldige categorie gekozen.")
+        terug = (input("\nDruk op enter om terug te gaan\n"))
+        if terug == "":
+            EONET(username) 
+
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+        terug = (input("\nDruk op enter om terug te gaan\n"))
+        if terug == "":
+            EONET(username)
+
+
 def main():
     username = AccountPagina()
     AppPagina(username)
+    
 
 main()
