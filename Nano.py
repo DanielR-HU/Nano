@@ -1,4 +1,14 @@
-#NanoXL!
+""" 
+Dit is de NanoXL opdracht van Daniel Roodenburg.
+Geprogameerd in Visual Studio Code met Github copilot.
+Github copilot is alleen gebruikt om het typen van de code te versnellen.
+De code heb ik voor het meeste zelf bedacht en geschreven.
+Natuurlijk heb ik stukjes code online opgezocht op random forums enzo.
+
+"""
+
+
+
 
 import time
 import random
@@ -34,7 +44,7 @@ def Files():
             file.write("paradox\nsubstantieel\nonverzettelijk\nepistemologie\nambivalentie\nstereotypisch\nnostalgisch\ntranscendent\nhypothese\nijdelheid\n")
 
 def clear():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    os.system('cls' if os.name == 'nt' else 'clear') # Dit zorgt er voor dat de cmd op windows en linux devices wordt gecleared
 
 def inloggen():
     clear()
@@ -60,6 +70,7 @@ def inloggen():
         print("Gebruikersnaam is fout of bestaat niet")
         time.sleep(1)
         return AccountPagina()
+    
 def registreren():
     clear()
     print("Welkom bij Nano\n")
@@ -94,7 +105,7 @@ def AccountPagina():
         return username
     elif keuze == "2":
         registreren()
-    elif keuze == "admin":
+    elif keuze == "admin": # Admin bypass
         return "admin"
     else:
         print("Foute invoer")
@@ -156,17 +167,17 @@ def CijferGuess(username):
 
     aantal_guesses = 0
     aantal_guesses = int(aantal_guesses)
-    nummer = random.randint(1, 10) # Maakt het random nummer
+    nummer = random.randint(1, 10)
 
-    while aantal_guesses < Cijfer_Graad: # Dit zorgt voor de hoeveelheid kansen die je hebt
+    while aantal_guesses < Cijfer_Graad:
         print(f"\n\nJe hebt gekozen voor {Cijfer_Graad} kansen om te raden\n")
         print(f"Je hebt {aantal_guesses} keer geraden\n")
         guess = input("Welk nummer tussen 1 en 10 denk je dat het is? \n\n> ")
         if guess.isnumeric():
-            guess = int(guess) # Dit probeert de input om te zetten naar een integer
-            if 1 <= guess <= 10: # Dit zorgt er voor dat het nummer tussen 1 en 10 is
-                aantal_guesses += 1 # Dit telt de aantal guesses op
-                if guess == nummer: # Dit zorgt er voor dat als je het nummer goed hebt geraden, dat het programma stopt
+            guess = int(guess)
+            if 1 <= guess <= 10:
+                aantal_guesses += 1
+                if guess == nummer:
                     clear()
                     print("\nGoed geraden!")
                     print(f"Je hebt het in {aantal_guesses} keer geraden\n")
@@ -179,7 +190,7 @@ def CijferGuess(username):
                     terug = (input("Druk op enter om verder te gaan\n"))
                     if terug == "":
                         AppPagina(username)
-                elif guess < nummer: # Dit zorgt er voor dat als je het nummer fout hebt geraden, dat het programma zegt of het nummer hoger of lager is
+                elif guess < nummer: 
                     clear()
                     print(f"\n{guess} is te laag\n")
                 else:
@@ -192,7 +203,7 @@ def CijferGuess(username):
             clear()
             print(f"\n{guess} is geen nummer\n")
 
-    if aantal_guesses == Cijfer_Graad and guess != nummer: # Dit zorgt er voor dat als je zo veel keer fout hebt geraden, dat het programma stopt en zegt wat het nummer was
+    if aantal_guesses == Cijfer_Graad and guess != nummer:
         print("\nJe hebt het nummer niet geraden")
         print(f"Het nummer was {nummer}\n")
         terug = (input("Druk op enter om verder te gaan\n"))
@@ -217,11 +228,11 @@ def Galgje(username):
             Galgje()                       
         
         
-        Geraden = 0 #Boolean om te kijken of het woord is geraden
-        Woord = Woordenlijst[random.randrange(0, len(Woordenlijst))] # Kiest een random woord uit de lijst
-        Letters = list(str.lower(Woord)) # Maakt een lijst van de letters van het woord
-        GeradenLetters = ['_' for _ in Letters] # Maakt een lijst van de letters van het woord, maar dan met underscores
-        Fouten = 0 # Aantal fouten die je hebt gemaakt
+        Geraden = False
+        Woord = Woordenlijst[random.randrange(0, len(Woordenlijst))]
+        Letters = list(str.lower(Woord))
+        GeradenLetters = ['_' for _ in Letters] # Dit maakt een lijst met dehoeveelheid letters als streepjes.
+        Fouten = 0
         
         # Galg variabelen
         clear()
@@ -236,9 +247,8 @@ def Galgje(username):
         print(Galg1)
         # Loop voor het spel
         Galgfouten = Galg1
-        print(str(GeradenLetters).replace("'", "").replace("[","").replace("]","").replace(",",""))
-        while Geraden == 0:
-            
+        print(str(GeradenLetters).replace("'", "").replace("[","").replace("]","").replace(",","")) # Dit heb ik gedaan omdat het werkte, de code ziet er niet mooi uit maar boeie.
+        while Geraden == False:
             LetterGuess = input("geef een letter (Geen Woord): \n\n>").lower()
             time.sleep(0.1)
             clear()
@@ -250,10 +260,10 @@ def Galgje(username):
                         GeradenLetters[i] = LetterGuess # Als de letter goed is, dan wordt de underscore vervangen door de letter
                 print(str(GeradenLetters).replace("'", "").replace("[","").replace("]","").replace(",",""))
                 if "_" not in GeradenLetters: # Als er geen underscores meer in de lijst zitten, dan is het woord geraden
-                    Geraden = 1
+                    Geraden = True
                     #GERADEN!!!!
                     datum = datetime.datetime.now()
-                    with open("LogGalgje.txt", "a") as file:
+                    with open("LogGalgje.txt", "a") as file: # Logging voor de log file
                         file.write(f"{username} heeft het woord {Woord} geraden met {Fouten} fouten op {datum}\n")
                     print("Je hebt het woord geraden!")
                     terug = (input("Druk op enter om verder te gaan\n"))
@@ -282,11 +292,11 @@ def Galgje(username):
                     print(Galgfouten)
                     print("\nGame Over\n")
                     print("Het woord was: ", Woord)
-                    terug = (input("\nDruk op enter om verder te gaan\n")) # Dit zorgt er voor dat je op enter moet drukken om verder te gaan naar het menu
+                    terug = (input("\nDruk op enter om verder te gaan\n"))
                     if terug == "":
                         AppPagina(username)
 
-                print("\nJe hebt de letter fout\n") # Als de letter fout is, dan wordt er een fout bij opgeteld
+                print("\nJe hebt de letter fout\n")
                 print("Aantal fouten:", Fouten)
                 print(str(GeradenLetters).replace("'", "").replace("[","").replace("]","").replace(",",""), "\n")
             if Fouten > 6:
@@ -302,13 +312,13 @@ def GalgjeLog(username):
         AppPagina(username)
 
 def BoterKaasEieren(username):
-    root = tk.Tk() # Dit maakt een tkinter window aan
-    root.title("Boter, Kaas en Eieren") # Dit zorgt er voor dat de titel van het window "Boter, Kaas en Eieren" is
+    root = tk.Tk()
+    root.title("Boter, Kaas en Eieren")
 
     speler = "X"
     bord = [["" for _ in range(3)] for _ in range(3)]
     def switch_player(): 
-        nonlocal speler # Dit zorgt er voor dat de speler variabele global is omdat het niet anders kan
+        nonlocal speler # Dit zorgt er voor dat de speler variabele global is omdat het helaas niet anders kan
         speler = "O" if speler == "X" else "X"
         return speler
     
@@ -328,17 +338,19 @@ def BoterKaasEieren(username):
             return True
         return False
 
+    # Variabele k is de variabele die de tekst van de button veranderd zie de rij van variabele k1_1 k1_2 etc.
+
     def button_click(button, k, rij, kolom):
-        if bord[rij][kolom] == "": #als het vakje leeg is
-            bord[rij][kolom] = speler #zet de speler icoon in het vakje bij het 2d bord
-            k.set(speler) #zet de speler icoon in de button
+        if bord[rij][kolom] == "":
+            bord[rij][kolom] = speler
+            k.set(speler) 
             if check_winnaar():
                 clear()
                 print(f"{speler} heeft gewonnen!")
                 root.destroy()
             switch_player()
 
-    k1_1 = tk.StringVar() #tk.StringVar() is een variabele die je kan gebruiken in een tkinter window
+    k1_1 = tk.StringVar()
     k1_2 = tk.StringVar() #tk.StringVar() zorgt er voor dat je de tekst van de button kan veranderen
     k1_3 = tk.StringVar() #simpel uitgelegd werkt het zo: als je de variabele veranderd, veranderd de tekst van de button ook
     k2_1 = tk.StringVar()
@@ -375,7 +387,7 @@ def BoterKaasEieren(username):
     button3_3 = tk.Button(root, textvariable=k3_3, width=10, height=5, command=lambda: button_click(button3_3, k3_3, 2, 2))
     button3_3.grid(row=2, column=2)
     
-    root.mainloop() # Dit zorgt er voor dat het window blijft draaien
+    root.mainloop()
     terug = (input("Druk op enter om verder te gaan\n"))
     if terug == "":
         AppPagina(username)
@@ -416,7 +428,7 @@ def HetWeer(username):
     HetWeer = voorspelling["Day"]["LongPhrase"]
     source = voorspelling["Sources"]
     
-    # En voorzelfsprekend printen we de data
+    
     clear()
     print(f"Vandaag in {city}:\n")
     print("Temperatuur:")
@@ -449,7 +461,7 @@ def EONET(username):
         clear()
     try:
         response = requests.get("https://eonet.gsfc.nasa.gov/api/v2.1/categories?days=31")
-        response.raise_for_status()  # Raise an HTTPError for bad responses
+        response.raise_for_status() #Dit moest ofzo voor errors. Ik zag het online en het werkte denk ik als er een error is.
         categories = response.json()["categories"]
         
         # Dit maakt een dictionary van de categorieën, waarbij de titel de key is en de hele categorie de value
@@ -462,8 +474,7 @@ def EONET(username):
         keuze = input("\nSchrijf de categorie precies over a.u.b.\nKies een categorie:\n> ")
         if keuze in category_map:
             categorieID = category_map[keuze]['id'] # Dit haalt de categorieID op van de gekozen categorie
-            responseCat = requests.get(f"https://eonet.gsfc.nasa.gov/api/v2.1/categories/{categorieID}?days=31") # Dit haalt de data op van de gekozen categorie
-            #print(responseCat.json())
+            responseCat = requests.get(f"https://eonet.gsfc.nasa.gov/api/v2.1/categories/{categorieID}?days=31") # Dit haalt de data op van de gekozen categorie.
             event_map = {event["title"]: event for event in responseCat.json()["events"]} # Dit maakt een dictionary van de events, waarbij de titel de key is en de hele event de value
             if not event_map:
                 clear()
@@ -482,6 +493,7 @@ def EONET(username):
         if terug == "":
             EONET(username) 
 
+    #Dit heb ik gehaald van het internet en ik weet niet of het werkt omdat ik nog geen error heb gehad
     except requests.exceptions.RequestException as e:
         print(f"An error occurred: {e}")
         terug = (input("\nDruk op enter om terug te gaan\n"))
@@ -493,5 +505,4 @@ def main():
     username = AccountPagina()
     AppPagina(username)
     
-
 main()
