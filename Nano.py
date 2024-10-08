@@ -14,8 +14,16 @@ import time
 import random
 import os
 import datetime
-import requests
-import tkinter as tk
+try:
+    import requests
+except:
+    os.system("pip install requests")
+    import requests
+try:
+    import tkinter as tk
+except:
+    os.system("pip install tkinter")
+    import tkinter as tk
 import json
 
 #main functies
@@ -116,7 +124,7 @@ def AppPagina(username):
     clear()
     print("Welkom bij Nano\n")
     print("Kies een app:")
-    print("1. CijferGuess\n2. Galgje\n3. Galgje log\n4. Boter kaas en eieren (GUI)\n5. Het weer\n6. EONET (NASA)\n7. Exit\n")
+    print("1. CijferGuess\n2. Galgje\n3. Galgje log\n4. Boter kaas en eieren (GUI)\n5. Het weer\n6. EONET (NASA)\n7. Recepten\n8. Exit\n")
     keuze = input("> ")
     if keuze == "1":
         CijferGuess(username)
@@ -131,6 +139,8 @@ def AppPagina(username):
     elif keuze == "6":
         EONET(username)
     elif keuze == "7":
+        Recepten(username)
+    elif keuze == "8":
         exit()
     else:
         print("Foute invoer")
@@ -425,7 +435,7 @@ def HetWeer(username):
     wind = voorspelling["Day"]["Wind"]["Speed"]["Value"]
     windRichting = voorspelling["Day"]["Wind"]["Direction"]["Localized"]
     wolkenCover = voorspelling["Day"]["CloudCover"]
-    HetWeer = voorspelling["Day"]["LongPhrase"]
+    Dag = voorspelling["Day"]["LongPhrase"]
     source = voorspelling["Sources"]
     
     
@@ -436,7 +446,7 @@ def HetWeer(username):
     print(f"De maximale temperatuur is vandaag {maxTemp} graden")
     print(f"De temperatuur voelt vandaag aan als {GevoelsTemp} graden")
     print("\n\nWeer:")
-    print(f"het weer is vandaag {weer}")
+    print(f"het weer is vandaag: {weer}")
     print(f"De luchtkwaliteit is vandaag {luchtKwaliteit}")
     print(f"De kans op onweer is vandaag {onweerKans}%")
     print(f"De kans op regen is vandaag {regenKans}%")
@@ -445,7 +455,7 @@ def HetWeer(username):
     print(f"De windsnelheid is vandaag {wind} km/h")
     print(f"De windrichting is vandaag {windRichting}")
     print(f"De bewolking is vandaag {wolkenCover}%")
-    print(f"Het weer is vandaag {HetWeer}")
+    print(f"Het weer is vandaag: {Dag}")
     print(f"\nBron: {source}")
 
     terug = (input("Druk op enter om verder te gaan\n"))
@@ -499,6 +509,123 @@ def EONET(username):
         terug = (input("\nDruk op enter om terug te gaan\n"))
         if terug == "":
             EONET(username)
+
+def Recepten(username):
+    def ReceptChooser():
+        naam = input("\nWelk recept wilt u bekijken?\n> ")
+        try:
+            data = requests.get(f"https://www.themealdb.com/api/json/v1/1/search.php?s={naam}")
+        except:
+            print("Iets is fout gegaan")
+            Recepten(username)
+        if data.json()["meals"] == None:
+            print("Recept niet gevonden")
+            terug = (input("\nDruk op enter om verder te gaan\n"))
+            if terug == "":
+                AppPagina(username)
+        strMeal = data.json()["meals"][0]["strMeal"]
+        strArea = data.json()["meals"][0]["strArea"]
+        strInstructions = data.json()["meals"][0]["strInstructions"]
+        clear()
+        print(f"Naam: {strMeal}\nPlaats: {strArea}\nInstructies: {strInstructions}\n\n\nIngrediënten:")
+        for i in range(1, 21):
+            ingredient = data.json()["meals"][0][f"strIngredient{i}"]
+            if ingredient != "":
+                print(f"{ingredient} - {data.json()["meals"][0][f"strMeasure{i}"]}")
+            else:
+                break
+        terug = (input("\nDruk op enter om verder te gaan\n"))
+        if terug == "":
+            AppPagina(username)
+
+    def CheckNone():
+        if data.json()["meals"] == None:
+            print("Recept niet gevonden")
+            terug = (input("\nDruk op enter om verder te gaan\n"))
+            if terug == "":
+                AppPagina(username)
+
+    clear()
+    print("Welkom bij de recepten app.\n")
+    keuze = input("Wilt u zoeken op naam, categorie, ingredient, plaats of random?\n> ").lower()
+    if keuze == "naam":
+        naam = input("Voer de naam van het recept in:\n> ")
+        try:
+            data = requests.get(f"https://www.themealdb.com/api/json/v1/1/search.php?s={naam}")
+        except:
+            print("Iets is fout gegaan")
+            Recepten(username)
+        CheckNone()
+        strMeal = data.json()["meals"][0]["strMeal"]
+        strArea = data.json()["meals"][0]["strArea"]
+        strInstructions = data.json()["meals"][0]["strInstructions"]
+        clear()
+        print(f"Naam: {strMeal}\nPlaats: {strArea}\nInstructies: {strInstructions}\n\n\nIngrediënten:")
+        for i in range(1, 21):
+            ingredient = data.json()["meals"][0][f"strIngredient{i}"]
+            if ingredient != "":
+                print(ingredient + " - " + data.json()["meals"][0][f"strMeasure{i}"])
+            else:
+                break
+        terug = (input("\nDruk op enter om verder te gaan\n"))
+        if terug == "":
+            AppPagina(username)
+
+    elif keuze == "categorie":
+        categories = requests.get("https://www.themealdb.com/api/json/v1/1/categories.php")
+        categories = categories.json()["categories"]
+        clear()
+        for category in categories:
+            print(category["strCategory"])
+        
+        categorie = input("\nVoer de categorie van het recept in:\n> ")
+        data = requests.get(f"https://www.themealdb.com/api/json/v1/1/filter.php?c={categorie}")
+        CheckNone()
+        clear()
+        for meal in data.json()["meals"]:
+            print(meal["strMeal"])
+        ReceptChooser()
+
+    elif keuze == "ingredient":
+        clear()
+        ingredient = input("Voer het ingredient van het recept in:\n> ")
+        data = requests.get(f"https://www.themealdb.com/api/json/v1/1/filter.php?i={ingredient}")
+        CheckNone()
+        clear()
+        for meal in data.json()["meals"]:
+            print(meal["strMeal"])
+        ReceptChooser()
+
+    elif keuze == "plaats":
+        plaatsen = requests.get("https://www.themealdb.com/api/json/v1/1/list.php?a=list")
+        for plaats in plaatsen.json()["meals"]:
+            print(plaats["strArea"])
+        plaats = input("Voer de plaats van het recept in:\n> ")
+        data = requests.get(f"https://www.themealdb.com/api/json/v1/1/filter.php?a={plaats}")
+        CheckNone()
+        clear()
+        for meal in data.json()["meals"]:
+            print(meal["strMeal"])
+        ReceptChooser()
+
+    elif keuze == "random":
+        data = requests.get("https://www.themealdb.com/api/json/v1/1/random.php")
+        strMeal = data.json()["meals"][0]["strMeal"]
+        strArea = data.json()["meals"][0]["strArea"]
+        strInstructions = data.json()["meals"][0]["strInstructions"]
+        clear()
+        print(f"Naam: {strMeal}\nPlaats: {strArea}\nInstructies: {strInstructions}\n\n\nIngrediënten:")
+        for i in range(1, 21):
+            ingredient = data.json()["meals"][0][f"strIngredient{i}"]
+            if ingredient != "":
+                print(ingredient + " - " + data.json()["meals"][0][f"strMeasure{i}"])
+            else:
+                break
+        terug = (input("\nDruk op enter om verder te gaan\n"))
+        if terug == "":
+            AppPagina(username)
+
+
 
 def main():
     Files()
