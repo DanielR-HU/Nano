@@ -24,9 +24,24 @@ try:
 except:
     os.system("pip install tkinter")
     import tkinter as tk
+try:
+    import psycopg2
+except:
+    os.system("pip install psycopg2")
+    import psycopg2
 import json
 
 #main functies
+
+def ConnectServer():
+    conn = psycopg2.connect(database = "DanielsCooleDatabase", 
+                        user = "postgres", 
+                        host= '135.236.57.232',
+                        password = "c+]O2<*_ 6uJ8f[.S~50",
+                        port = 5432)
+    return conn
+
+
 def Files():
     if not os.path.exists("users.json"):
         with open("users.json", "w") as file:
@@ -63,22 +78,35 @@ def inloggen():
     print("\nWachtwoord:")
     password = input("> ")
 
-    data = json.load(open("users.json"))
-    if username in data:
-        if data[username] == password:
+    ConnectServer()
+    conn = ConnectServer()
+    cur = conn.cursor()
+    cur.execute(f"SELECT * FROM users WHERE username = '{username}'")
+    if cur.fetchone() is not None:
+        cur.execute(f"SELECT wachtwoord FROM users WHERE username = '{username}'")
+        if cur.fetchone()[0] == password:
             clear()
             print(f"Welkom {username}")
             time.sleep(1)
+            cur.close()
+            conn.close()
             return username
         else:
             print("Wachtwoord is fout")
             time.sleep(1)
+            cur.close()
+            conn.close()
             return AccountPagina()
     else:
         print("Gebruikersnaam is fout of bestaat niet")
         time.sleep(1)
+        cur.close()
+        conn.close()
         return AccountPagina()
     
+
+
+
 def registreren():
     clear()
     print("Welkom bij Nano\n")
@@ -87,20 +115,25 @@ def registreren():
     username = input(">")
     print("\nWachtwoord:")
     password = input(">")
+    ConnectServer()
+    conn = ConnectServer()
+    cur = conn.cursor()
+    try:
+        cur.execute(f"SELECT * FROM users WHERE username = '{username}'")
+        if cur.fetchone() is not None:
+            print("Gebruikersnaam bestaat al")
+            time.sleep(1)
+            return AccountPagina()
+        else:
+            cur.execute(f"INSERT INTO users (wachtwoord, highscore, username) VALUES ('{password}', 0, '{username}')")
+            print("Account aangemaakt")
+    except Exception as e:
+        print(f"Er is iets fout gegaan {e}")
+        time.sleep(10)
 
-    with open("users.json", "r") as file:
-        data = json.load(file)
-
-    if username in data:
-        print("Gebruikersnaam bestaat al")
-        time.sleep(1)
-        AccountPagina()
-    else:
-        data[username] = password
-        with open("users.json", "w") as file:
-            json.dump(data, file, indent=4) # Dit zorgt er voor dat de data in de json file wordt gezet en indent=4 zorgt er voor dat het netjes wordt opgeslagen
-        print("Registratie succesvol")
-
+    conn.commit()
+    cur.close()
+    conn.close()
     time.sleep(1)
     return AccountPagina()
 
@@ -149,17 +182,16 @@ def AppPagina(username):
 
 def CijferGuess(username):
     highscore = 0
-    with open("HighscoresNummer.json", "r") as file:
-        data = json.load(file)
 
-    if username in data:
-        highscore = data[username]
-
-    else:
-        data[username] = highscore
-        with open("HighscoresNummer.json", "w") as file:
-            json.dump(data, file, indent=4)
-        
+    ConnectServer()
+    conn = ConnectServer()
+    cur = conn.cursor()
+    cur.execute(f"SELECT highscore FROM users WHERE username = '{username}'")
+    highscore = cur.fetchone()[0]
+    
+    conn.commit()
+    cur.close()
+    conn.close()
     clear()
     Cijfer_Graad = input(f"\t\t\tWelkom bij het cijfer guess spel {username}!\n\t\t\t   --------Je highscore is {highscore}--------\n\n\t\tVul het cijfer in van de moeilijkeids graad die je wilt. \n\n\nWil je het makkelijk, normaal of moeilijk maken?\n 8 = makkelijk\n 4 = normaal\n 3 = moeilijk\n 1 = onmogelijk\n\n> ")
     if Cijfer_Graad.isdigit():
@@ -194,9 +226,14 @@ def CijferGuess(username):
                     if int(aantal_guesses) < int(highscore) or int(highscore) == 0:
                         print("Je hebt een nieuwe highscore!")
                         highscore = aantal_guesses
-                        data[username] = highscore
-                        with open("HighscoresNummer.json", "w") as file:
-                            json.dump(data, file, indent=4)
+                        ConnectServer()
+                        conn = ConnectServer()
+                        cur = conn.cursor()
+                        cur.execute(f"UPDATE users SET highscore = {highscore} WHERE username = '{username}'")
+                        conn.commit()
+                        cur.close()
+                        conn.close()
+
                     terug = (input("Druk op enter om verder te gaan\n"))
                     if terug == "":
                         AppPagina(username)
