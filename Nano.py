@@ -1,10 +1,7 @@
 """ 
-Dit is de NanoXL opdracht van Daniel Roodenburg.
+Dit is de NanoXL opdracht (SQL SERVER version) van Daniel Roodenburg.
 Geprogameerd in Visual Studio Code met Github copilot.
-Github copilot is alleen gebruikt om het typen van de code te versnellen.
-De code heb ik voor het meeste zelf bedacht en geschreven.
-Natuurlijk heb ik stukjes code online opgezocht op random forums enzo.
-
+Ik heb voor de sql gedeelte best veel internet gebruikt dus heel goed snap ik het niet maar redelijk goed.
 """
 
 
@@ -32,7 +29,6 @@ except:
 import json
 
 #main functies
-
 def ConnectServer():
     conn = psycopg2.connect(database = "DanielsCooleDatabase", 
                         user = "postgres", 
@@ -41,15 +37,7 @@ def ConnectServer():
                         port = 5432)
     return conn
 
-
 def Files():
-    if not os.path.exists("users.json"):
-        with open("users.json", "w") as file:
-            json.dump({}, file)
-    if not os.path.exists("HighscoresNummer.json"):
-        with open("HighscoresNummer.json", "w") as file:
-            json.dump({}, file)
-
     if not os.path.exists("LogGalgje.txt"):
         with open("LogGalgje.txt", "w") as file:
             file.write("")
@@ -103,9 +91,6 @@ def inloggen():
         cur.close()
         conn.close()
         return AccountPagina()
-    
-
-
 
 def registreren():
     clear()
@@ -661,8 +646,6 @@ def Recepten(username):
         terug = (input("\nDruk op enter om verder te gaan\n"))
         if terug == "":
             AppPagina(username)
-
-
 
 def main():
     Files()
